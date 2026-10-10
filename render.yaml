@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: rentx
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn vehicle_rental.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: "True"
