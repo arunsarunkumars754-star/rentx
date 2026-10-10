@@ -1,0 +1,1813 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}RENTX - Drive Your Journey. Your Way. | Vehicle Rental{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ==========================================================================
+       RENTX DESIGN SYSTEM - LUXURY & MODERN RENTAL PALETTE
+       ========================================================================== */
+    :root {
+        --rx-primary: #2563eb;
+        --rx-primary-glow: rgba(37, 99, 235, 0.4);
+        --rx-primary-dark: #1d4ed8;
+        --rx-accent: #06b6d4;
+        --rx-dark-bg: #070d19;
+        --rx-dark-surface: #0f172a;
+        --rx-dark-card: #141e33;
+        --rx-dark-border: rgba(255, 255, 255, 0.08);
+        --rx-text-white: #ffffff;
+        --rx-text-dim: #94a3b8;
+    }
+
+    /* ---------------- 1. HERO SECTION ---------------- */
+    .rentx-hero-premium {
+        position: relative;
+        background: radial-gradient(circle at 80% 20%, #1e3a6a 0%, #0c1527 45%, #050a14 100%);
+        min-height: 560px;
+        padding: 90px 0 130px;
+        color: #ffffff;
+        overflow: hidden;
+    }
+
+    .hero-bg-overlay {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 60%;
+        height: 100%;
+        background-image: url('/static/images/vehicles/hero_bg.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center right;
+        opacity: 0.42;
+        mask-image: linear-gradient(to right, transparent 0%, black 50%, black 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.85) 60%, black 100%);
+        pointer-events: none;
+        transition: transform 10s ease;
+    }
+
+    .rentx-hero-premium:hover .hero-bg-overlay {
+        transform: scale(1.03);
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 30px;
+        background: rgba(37, 99, 235, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        color: #60a5fa;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 22px;
+        box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+    }
+
+    .hero-heading {
+        font-size: 3.6rem;
+        font-weight: 800;
+        line-height: 1.12;
+        letter-spacing: -1.8px;
+        margin-bottom: 18px;
+        background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle-text {
+        font-size: 1.25rem;
+        color: #94a3b8;
+        font-weight: 400;
+        line-height: 1.6;
+        max-width: 580px;
+        margin-bottom: 34px;
+    }
+
+    .hero-cta-btn {
+        padding: 14px 32px;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: 12px;
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .hero-cta-primary {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: #ffffff;
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.45);
+        border: none;
+    }
+
+    .hero-cta-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
+        color: #ffffff;
+    }
+
+    .hero-cta-secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-cta-secondary:hover {
+        background: rgba(255, 255, 255, 0.16);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+    }
+
+    /* ---------------- 2. SEARCH & FILTER SECTION ---------------- */
+    .search-filter-anchor {
+        margin-top: -65px;
+        position: relative;
+        z-index: 30;
+    }
+
+    .search-filter-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        padding: 24px 28px;
+    }
+
+    .filter-widget-label {
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #64748b;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-widget-label i {
+        color: var(--primary);
+    }
+
+    .filter-widget-control {
+        width: 100%;
+        border: 1.5px solid #e2e8f0;
+        background-color: #f8fafc;
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: #0f172a;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+
+    .filter-widget-control:focus {
+        border-color: var(--primary);
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    /* ---------------- 3. FLEET CARDS & STATUS BADGES ---------------- */
+    .section-headline-tag {
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin-bottom: 6px;
+        display: inline-block;
+    }
+
+    .section-main-heading {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.8px;
+        margin-bottom: 8px;
+    }
+
+    .section-subtext {
+        font-size: 1.05rem;
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    .status-badge-lg {
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        padding: 5px 11px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .status-badge-lg.available {
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+    }
+
+    .status-badge-lg.rented {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+
+    .status-badge-lg.maintenance {
+        background: #fffbeb;
+        color: #d97706;
+        border: 1px solid #fde68a;
+    }
+
+    .pulse-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .available .pulse-dot {
+        background: #10b981;
+        box-shadow: 0 0 0 0 rgba(16,185,129,0.7);
+        animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
+        70% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+        100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+
+    .rented .pulse-dot { background: #ef4444; }
+    .maintenance .pulse-dot { background: #f59e0b; }
+
+    .vehicle-spec-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 4px 9px;
+        border-radius: 7px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    /* ---------------- 4. CATEGORIES SECTION ---------------- */
+    .category-box-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid var(--card-border);
+        padding: 28px 24px;
+        text-decoration: none;
+        color: #0f172a;
+        display: block;
+        transition: all 0.25s ease;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-box-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--primary);
+        box-shadow: 0 16px 36px rgba(37, 99, 235, 0.12);
+        color: #0f172a;
+    }
+
+    .category-box-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 14px;
+        background: #eff6ff;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.85rem;
+        margin-bottom: 20px;
+        transition: all 0.25s ease;
+    }
+
+    .category-box-card:hover .category-box-icon {
+        background: var(--primary);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    }
+
+    /* ---------------- 5. WHY CHOOSE RENTX ---------------- */
+    .why-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid var(--card-border);
+        padding: 28px;
+        height: 100%;
+        transition: all 0.25s ease;
+    }
+
+    .why-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        border-color: #cbd5e1;
+    }
+
+    .why-icon-wrap {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 18px;
+    }
+
+    /* ---------------- 6. HOW IT WORKS ---------------- */
+    .step-process-card {
+        position: relative;
+        text-align: center;
+        padding: 24px;
+    }
+
+    .step-number-bubble {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 2px solid var(--primary);
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin: 0 auto 20px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .step-connector-line {
+        position: absolute;
+        top: 60px;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background: #cbd5e1;
+        z-index: 1;
+    }
+
+    @media (max-width: 991px) {
+        .step-connector-line { display: none; }
+    }
+
+    /* ---------------- 7. POPULAR VEHICLES TABS ---------------- */
+    .popular-tab-btn {
+        padding: 10px 24px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border-radius: 30px;
+        border: 1.5px solid #e2e8f0;
+        background: #ffffff;
+        color: #475569;
+        transition: all 0.2s ease;
+    }
+
+    .popular-tab-btn.active, .popular-tab-btn:hover {
+        background: var(--primary);
+        color: #ffffff;
+        border-color: var(--primary);
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+    }
+
+    /* ---------------- 8. SPECIAL OFFER BANNER ---------------- */
+    .special-offer-banner {
+        background: linear-gradient(135deg, #091222 0%, #1e3a6a 60%, #1d4ed8 100%);
+        border-radius: 24px;
+        padding: 48px;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+    }
+
+    .special-offer-banner::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .promo-code-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1.5px dashed rgba(255, 255, 255, 0.4);
+        padding: 8px 18px;
+        border-radius: 12px;
+        font-family: monospace;
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        color: #fef08a;
+    }
+
+    /* ---------------- 9. SAFETY & TRUST ---------------- */
+    .safety-item-box {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        transition: transform 0.2s ease;
+    }
+
+    .safety-item-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        border-color: #cbd5e1;
+    }
+
+    /* ---------------- 10. CUSTOMER REVIEWS ---------------- */
+    .review-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid var(--card-border);
+        padding: 30px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.25s ease;
+    }
+
+    .review-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 30px rgba(0,0,0,0.06);
+    }
+
+    .review-quote-mark {
+        font-size: 2.2rem;
+        color: #93c5fd;
+        line-height: 1;
+        margin-bottom: 12px;
+    }
+
+    /* ---------------- 11. STATISTICS SECTION ---------------- */
+    .stat-metric-card {
+        text-align: center;
+        padding: 32px 20px;
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+    }
+
+    .stat-metric-number {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--primary);
+        line-height: 1;
+        margin-bottom: 8px;
+        letter-spacing: -1px;
+    }
+
+    /* ---------------- 12. FAQ ACCORDION ---------------- */
+    .accordion-rentx .accordion-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 14px !important;
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .accordion-rentx .accordion-button {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #0f172a;
+        padding: 20px 24px;
+        background: #ffffff;
+        box-shadow: none;
+    }
+
+    .accordion-rentx .accordion-button:not(.collapsed) {
+        color: var(--primary);
+        background: #eff6ff;
+    }
+
+    .accordion-rentx .accordion-body {
+        padding: 16px 24px 22px;
+        color: #475569;
+        font-size: 0.98rem;
+        line-height: 1.6;
+    }
+
+    /* ---------------- 13. LOCATIONS ---------------- */
+    .location-hub-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 30px;
+        padding: 10px 22px;
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        transition: all 0.2s ease;
+    }
+
+    .location-hub-pill:hover {
+        background: var(--primary);
+        color: #ffffff;
+        border-color: var(--primary);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    }
+
+    .location-hub-pill:hover i {
+        color: #ffffff !important;
+    }
+
+    /* ---------------- 14. NEWSLETTER ---------------- */
+    .newsletter-box {
+        background: radial-gradient(circle at 10% 20%, #1e3a6a 0%, #0c1527 60%, #060d1a 100%);
+        border-radius: 24px;
+        padding: 56px 40px;
+        color: #ffffff;
+        text-align: center;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
+    }
+
+    .newsletter-input {
+        background: #ffffff;
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-size: 1rem;
+        color: #0f172a;
+        font-weight: 500;
+        outline: none;
+        width: 100%;
+        max-width: 440px;
+    }
+
+    .newsletter-input:focus {
+        border-color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ==========================================================================
+     1. HERO SECTION
+     ========================================================================== -->
+<section class="rentx-hero-premium position-relative">
+    <div class="hero-bg-overlay"></div>
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center">
+            <div class="col-lg-7 col-md-10">
+                <div class="hero-badge">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>Premium Vehicle Rental Platform</span>
+                </div>
+                <h1 class="hero-heading">
+                    Drive Your Journey.<br>Your Way.
+                </h1>
+                <p class="hero-subtitle-text">
+                    Rent reliable cars, SUVs, bikes, and vans at affordable daily rates.
+                </p>
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <a href="#fleet" class="hero-cta-btn hero-cta-primary">
+                        <i class="fa-solid fa-car-side"></i>
+                        <span>Explore Vehicles</span>
+                    </a>
+                    <a href="#search-console" class="hero-cta-btn hero-cta-secondary">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Book Now</span>
+                    </a>
+                </div>
+
+                <!-- Verified Fleet Micro Highlights -->
+                <div class="d-flex align-items-center gap-4 mt-5 pt-2 text-white text-opacity-75 small">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-shield-check text-primary fs-5"></i>
+                        <span>Zero Security Hassles</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-clock text-primary fs-5"></i>
+                        <span>Instant Paperless KYC</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-star text-warning fs-5"></i>
+                        <span>4.8/5 Star Rated</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     2. VEHICLE SEARCH AND FILTER CONSOLE
+     ========================================================================== -->
+<div class="container search-filter-anchor" id="search-console">
+    <div class="search-filter-card">
+        <form action="{% url 'vehicles_catalog' %}" method="GET" id="heroFilterForm">
+            <div class="row g-3">
+                <!-- Vehicle Name / Search -->
+                <div class="col-lg-3 col-md-6">
+                    <label class="filter-widget-label"><i class="fa-solid fa-magnifying-glass"></i> Search Vehicle</label>
+                    <input type="text" name="q" id="searchNameInput" class="filter-widget-control" placeholder="e.g. Fortuner, Duke, Creta..." onkeyup="filterFleetLocally()">
+                </div>
+
+                <!-- Category -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="filter-widget-label"><i class="fa-solid fa-shapes"></i> Category</label>
+                    <select name="category" id="searchCategorySelect" class="filter-widget-control" onchange="filterFleetLocally()">
+                        <option value="All" selected>All Categories</option>
+                        <option value="Cars">🚗 Cars</option>
+                        <option value="SUVs">🏔️ SUVs & 4x4</option>
+                        <option value="Bikes">🏍️ Bikes & Scooters</option>
+                        <option value="Vans">🚐 Vans</option>
+                    </select>
+                </div>
+
+                <!-- Fuel Type -->
+                <div class="col-lg-2 col-md-4">
+                    <label class="filter-widget-label"><i class="fa-solid fa-gas-pump"></i> Fuel Type</label>
+                    <select name="fuel" id="searchFuelSelect" class="filter-widget-control" onchange="filterFleetLocally()">
+                        <option value="All" selected>All Fuels</option>
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Electric">Electric</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Manual">Manual</option>
+                    </select>
+                </div>
+
+                <!-- Transmission -->
+                <div class="col-lg-2 col-md-4">
+                    <label class="filter-widget-label"><i class="fa-solid fa-gear"></i> Transmission</label>
+                    <select name="transmission" id="searchTransmissionSelect" class="filter-widget-control" onchange="filterFleetLocally()">
+                        <option value="All" selected>All Transmissions</option>
+                        <option value="Automatic">Automatic</option>
+                        <option value="Manual">Manual</option>
+                    </select>
+                </div>
+
+                <!-- Number of Seats -->
+                <div class="col-lg-1 col-md-4">
+                    <label class="filter-widget-label"><i class="fa-solid fa-users"></i> Seats</label>
+                    <select name="seats" id="searchSeatsSelect" class="filter-widget-control" onchange="filterFleetLocally()">
+                        <option value="All" selected>All</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="7">7</option>
+                    </select>
+                </div>
+
+                <!-- Availability -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="filter-widget-label"><i class="fa-solid fa-circle-check"></i> Availability</label>
+                    <select name="status" id="searchStatusSelect" class="filter-widget-control" onchange="filterFleetLocally()">
+                        <option value="All" selected>All Status</option>
+                        <option value="Available">Available Only</option>
+                        <option value="Rented">Rented</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Price Range & Action Buttons -->
+            <div class="row g-3 align-items-center mt-2 pt-2 border-top">
+                <div class="col-lg-6 col-md-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <label class="filter-widget-label mb-0 text-nowrap"><i class="fa-solid fa-indian-rupee-sign"></i> Max Price:</label>
+                        <input type="range" class="form-range" id="priceRangeSlider" min="300" max="8000" step="100" value="8000" oninput="updatePriceLabel(this.value)">
+                        <span class="fw-bold text-primary small text-nowrap" id="priceDisplay">₹8,000/day</span>
+                        <input type="hidden" name="max_price" id="hiddenMaxPrice" value="8000">
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-2 fw-semibold rounded-3" onclick="resetFleetFilters()">
+                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                    </button>
+                    <button type="submit" class="btn-rentx-primary px-4 py-2 small fw-bold">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Full Catalog Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     3. EXPLORE OUR FLEET
+     ========================================================================== -->
+<section class="container my-5 py-4" id="fleet">
+    <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-4 gap-3">
+        <div>
+            <span class="section-headline-tag">Direct Fleet Inventory</span>
+            <h2 class="section-main-heading">Explore Our Fleet</h2>
+            <p class="section-subtext">Choose from top-tier sedans, rugged SUVs, cruisers, and spacious passenger vans.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-light text-dark border px-3 py-2 fw-bold" id="fleetCountBadge">
+                Showing {{ vehicles|length }} Vehicles
+            </span>
+            <a href="{% url 'vehicles_catalog' %}" class="btn-rentx-outline py-2 px-3 small">
+                <span>View Full Catalog</span>
+                <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Live Category Filter Buttons for Instant Interaction -->
+    <div class="d-flex gap-2 flex-wrap mb-4 pb-2 border-bottom">
+        <button type="button" class="btn btn-sm btn-primary text-white fw-bold shadow-sm px-4 py-2 rounded-pill fleet-pill-btn active" data-cat="All" onclick="setFleetCategoryFilter('All', this)">
+            All Fleet ({{ vehicles|length }})
+        </button>
+        {% for cat in categories %}
+        <button type="button" class="btn btn-sm btn-light text-dark border px-4 py-2 rounded-pill fleet-pill-btn" data-cat="{{ cat.name }}" onclick="setFleetCategoryFilter('{{ cat.name }}', this)">
+            {{ cat.emoji }} {{ cat.title }} ({{ cat.count }})
+        </button>
+        {% endfor %}
+        <button type="button" class="btn btn-sm btn-outline-success border px-3 py-2 rounded-pill ms-auto fw-bold" onclick="toggleAvailableOnly(this)">
+            <i class="fa-solid fa-bolt me-1"></i> Available Only
+        </button>
+    </div>
+
+    <!-- Dynamic Fleet Cards Grid -->
+    <div class="row g-4" id="fleetCardContainer">
+        {% for v in vehicles %}
+        <div class="col-lg-4 col-md-6 fleet-item" 
+             data-model="{{ v.Model|lower }}" 
+             data-category="{{ v.meta.category }}" 
+             data-fuel="{{ v.fuel_type }}" 
+             data-transmission="{{ v.meta.transmission }}" 
+             data-seats="{{ v.meta.seats }}" 
+             data-status="{{ v.status }}" 
+             data-price="{{ v.Rental_rate }}">
+            <div class="vehicle-card">
+                <!-- Vehicle Image & Status Badge -->
+                <div class="vehicle-img-wrap">
+                    <img src="{{ v.meta.image }}" alt="{{ v.Model }}" loading="lazy">
+                    <div class="position-absolute top-0 end-0 m-3">
+                        {% if v.status == 'Available' %}
+                        <span class="status-badge-lg available">
+                            <span class="pulse-dot"></span> AVAILABLE
+                        </span>
+                        {% elif v.status == 'Rented' %}
+                        <span class="status-badge-lg rented">
+                            <span class="pulse-dot"></span> RENTED
+                        </span>
+                        {% else %}
+                        <span class="status-badge-lg maintenance">
+                            <span class="pulse-dot"></span> MAINTENANCE
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Vehicle Card Details -->
+                <div class="p-4 d-flex flex-column flex-grow-1">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.5px;">{{ v.meta.category }}</span>
+                        <span class="car-meta-rating">
+                            <i class="fa-solid fa-star text-warning"></i>
+                            <span>{{ v.meta.rating }}</span>
+                        </span>
+                    </div>
+
+                    <h4 class="fw-bold mb-2" style="font-size: 1.28rem; color: #0f172a;">{{ v.Model }}</h4>
+
+                    <!-- Vehicle Specification Pills -->
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="vehicle-spec-pill">
+                            <i class="fa-solid fa-gas-pump text-primary"></i> {{ v.fuel_type }}
+                        </span>
+                        <span class="vehicle-spec-pill">
+                            <i class="fa-solid fa-gear text-primary"></i> {{ v.meta.transmission }}
+                        </span>
+                        <span class="vehicle-spec-pill">
+                            <i class="fa-solid fa-users text-primary"></i> {{ v.meta.seats }} Seats
+                        </span>
+                    </div>
+
+                    <!-- Price & Actions -->
+                    <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="car-price-tag">₹{{ v.Rental_rate|floatformat:0 }}<span class="car-price-unit">/day</span></div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{% url 'vehicle_detail' v.vehicle_id %}" class="btn-rentx-outline py-2 px-3 small">
+                                View
+                            </a>
+                            {% if v.status == 'Available' %}
+                            <a href="{% url 'vehicle_detail' v.vehicle_id %}#bookingFormCard" class="btn-rentx-primary py-2 px-3 small">
+                                Book
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Live Empty State Message -->
+    <div id="fleetEmptyState" class="text-center py-5 d-none">
+        <div class="p-5 bg-white rounded-4 border shadow-sm mx-auto" style="max-width: 480px;">
+            <i class="fa-solid fa-car-side text-primary opacity-50 display-4 mb-3"></i>
+            <h4 class="fw-bold">No Vehicles Match Your Selection</h4>
+            <p class="text-muted small mb-4">Try clearing filters or resetting the search parameters above.</p>
+            <button type="button" class="btn-rentx-primary px-4 py-2" onclick="resetFleetFilters()">
+                Reset Filters
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     4. VEHICLE CATEGORIES (EXPLORE BY CATEGORY)
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="text-center max-w-700 mx-auto mb-5">
+        <span class="section-headline-tag">Curated Collections</span>
+        <h2 class="section-main-heading">Explore by Category</h2>
+        <p class="section-subtext">Find the ideal vehicle tailored precisely to your journey type and driving style.</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- 🚗 Cars -->
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'vehicles_catalog' %}?category=Cars" class="category-box-card">
+                <div class="category-box-icon">
+                    <i class="fa-solid fa-car"></i>
+                </div>
+                <h4 class="fw-bold mb-2">🚗 Cars</h4>
+                <p class="text-muted small mb-3">Comfortable vehicles for city travel and business trips.</p>
+                <div class="d-flex align-items-center justify-content-between text-primary fw-bold small">
+                    <span>Browse Cars</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
+        <!-- 🏔️ SUVs & 4x4 -->
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'vehicles_catalog' %}?category=SUVs" class="category-box-card">
+                <div class="category-box-icon">
+                    <i class="fa-solid fa-truck-monster"></i>
+                </div>
+                <h4 class="fw-bold mb-2">🏔️ SUVs & 4x4</h4>
+                <p class="text-muted small mb-3">Perfect for long drives and adventurous journeys.</p>
+                <div class="d-flex align-items-center justify-content-between text-primary fw-bold small">
+                    <span>Browse SUVs</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
+        <!-- 🏍️ Bikes & Scooters -->
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'vehicles_catalog' %}?category=Bikes" class="category-box-card">
+                <div class="category-box-icon">
+                    <i class="fa-solid fa-motorcycle"></i>
+                </div>
+                <h4 class="fw-bold mb-2">🏍️ Bikes & Scooters</h4>
+                <p class="text-muted small mb-3">Affordable and convenient for city commuting.</p>
+                <div class="d-flex align-items-center justify-content-between text-primary fw-bold small">
+                    <span>Browse Bikes</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
+        <!-- 🚐 Vans -->
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'vehicles_catalog' %}?category=Vans" class="category-box-card">
+                <div class="category-box-icon">
+                    <i class="fa-solid fa-van-shuttle"></i>
+                </div>
+                <h4 class="fw-bold mb-2">🚐 Vans</h4>
+                <p class="text-muted small mb-3">Spacious vehicles for families and groups.</p>
+                <div class="d-flex align-items-center justify-content-between text-primary fw-bold small">
+                    <span>Browse Vans</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     5. WHY CHOOSE RENTX
+     ========================================================================== -->
+<section class="container my-5 py-4" id="about">
+    <div class="text-center mb-5">
+        <span class="section-headline-tag">The RENTX Advantage</span>
+        <h2 class="section-main-heading">Why Choose RENTX?</h2>
+        <p class="section-subtext">Delivering unmatched quality, transparent pricing, and peace of mind on every journey.</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- 1. Wide Range of Vehicles -->
+        <div class="col-lg-4 col-md-6">
+            <div class="why-card">
+                <div class="why-icon-wrap">
+                    <i class="fa-solid fa-car-rear"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Wide Range of Vehicles</h5>
+                <p class="text-muted small mb-0">From budget two-wheelers and fuel-efficient hatchbacks to luxury sports sedans and rugged 4x4 SUVs.</p>
+            </div>
+        </div>
+
+        <!-- 2. Affordable Pricing -->
+        <div class="col-lg-4 col-md-6">
+            <div class="why-card">
+                <div class="why-icon-wrap">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Affordable Pricing</h5>
+                <p class="text-muted small mb-0">Transparent daily rates starting as low as ₹300/day with zero hidden charges or surprise weekend surges.</p>
+            </div>
+        </div>
+
+        <!-- 3. Secure Booking -->
+        <div class="col-lg-4 col-md-6">
+            <div class="why-card">
+                <div class="why-icon-wrap">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Secure Booking</h5>
+                <p class="text-muted small mb-0">Encrypted payment gateways and automated confirmation receipts tied directly to your verified booking record.</p>
+            </div>
+        </div>
+
+        <!-- 4. Quick & Easy Booking -->
+        <div class="col-lg-4 col-md-6">
+            <div class="why-card">
+                <div class="why-icon-wrap">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Quick & Easy Booking</h5>
+                <p class="text-muted small mb-0">Book your chosen vehicle in under 2 minutes with paperless KYC and instant digital reservation confirmation.</p>
+            </div>
+        </div>
+
+        <!-- 5. Well-Maintained Vehicles -->
+        <div class="col-lg-4 col-md-6">
+            <div class="why-card">
+                <div class="why-icon-wrap">
+                    <i class="fa-solid fa-wrench"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Well-Maintained Vehicles</h5>
+                <p class="text-muted small mb-0">Every vehicle undergoes thorough 40-point safety inspections, deep sanitization, and regular fluid servicing.</p>
+            </div>
+        </div>
+
+        <!-- 6. Reliable Customer Support -->
+        <div class="col-lg-4 col-md-6">
+            <div class="why-card">
+                <div class="why-icon-wrap">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Reliable Customer Support</h5>
+                <p class="text-muted small mb-0">Dedicated support team and round-the-clock roadside assistance available via direct phone and WhatsApp.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     6. HOW IT WORKS (RENT IN 3 SIMPLE STEPS)
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="text-center mb-5">
+        <span class="section-headline-tag">Seamless Experience</span>
+        <h2 class="section-main-heading">Rent in 3 Simple Steps</h2>
+        <p class="section-subtext">Get on the road quickly with our streamlined rental booking flow.</p>
+    </div>
+
+    <div class="row g-4 position-relative">
+        <!-- Step 01 -->
+        <div class="col-lg-4 col-md-12">
+            <div class="step-process-card">
+                <div class="step-connector-line"></div>
+                <div class="step-number-bubble">01</div>
+                <h4 class="fw-bold mb-2">Choose a Vehicle</h4>
+                <p class="text-muted small mb-0">Browse our fleet and select the vehicle that suits your journey.</p>
+            </div>
+        </div>
+
+        <!-- Step 02 -->
+        <div class="col-lg-4 col-md-12">
+            <div class="step-process-card">
+                <div class="step-connector-line"></div>
+                <div class="step-number-bubble">02</div>
+                <h4 class="fw-bold mb-2">Select Date & Location</h4>
+                <p class="text-muted small mb-0">Choose your pickup and return dates and location.</p>
+            </div>
+        </div>
+
+        <!-- Step 03 -->
+        <div class="col-lg-4 col-md-12">
+            <div class="step-process-card">
+                <div class="step-number-bubble">03</div>
+                <h4 class="fw-bold mb-2">Confirm & Drive</h4>
+                <p class="text-muted small mb-0">Complete your booking and enjoy your journey.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     7. POPULAR VEHICLES (POPULAR CHOICES)
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-4 gap-3">
+        <div>
+            <span class="section-headline-tag">Customer Favorites</span>
+            <h2 class="section-main-heading">Popular Choices</h2>
+            <p class="section-subtext">Top picks selected from our verified database based on rental demand and comfort.</p>
+        </div>
+
+        <!-- Subcategory Navigation Pills -->
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="popular-tab-btn active" onclick="showPopularTab('most_rented', this)">
+                🔥 Most Rented
+            </button>
+            <button type="button" class="popular-tab-btn" onclick="showPopularTab('families', this)">
+                👨‍👩‍👧‍👦 Best for Families
+            </button>
+            <button type="button" class="popular-tab-btn" onclick="showPopularTab('budget', this)">
+                💰 Budget Friendly
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab 1: Most Rented (Honda City, KTM Duke 390, Hyundai Creta) -->
+    <div class="popular-tab-content" id="popular_most_rented">
+        <div class="row g-4">
+            {% for v in popular_groups.most_rented %}
+            <div class="col-lg-4 col-md-6">
+                <div class="vehicle-card">
+                    <div class="vehicle-img-wrap">
+                        <img src="{{ v.meta.image }}" alt="{{ v.Model }}">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="status-badge-lg {% if v.status == 'Available' %}available{% elif v.status == 'Rented' %}rented{% else %}maintenance{% endif %}">
+                                <span class="pulse-dot"></span> {{ v.status|upper }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-uppercase small fw-bold text-muted">{{ v.meta.category }}</span>
+                            <span class="car-meta-rating"><i class="fa-solid fa-star text-warning"></i> {{ v.meta.rating }}</span>
+                        </div>
+                        <h4 class="fw-bold mb-2">{{ v.Model }}</h4>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-gas-pump text-primary"></i> {{ v.fuel_type }}</span>
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-gear text-primary"></i> {{ v.meta.transmission }}</span>
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-users text-primary"></i> {{ v.meta.seats }} Seats</span>
+                        </div>
+                        <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+                            <div class="car-price-tag">₹{{ v.Rental_rate|floatformat:0 }}<span class="car-price-unit">/day</span></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{% url 'vehicle_detail' v.vehicle_id %}" class="btn-rentx-outline py-2 px-3 small">View</a>
+                                {% if v.status == 'Available' %}
+                                <a href="{% url 'vehicle_detail' v.vehicle_id %}#bookingFormCard" class="btn-rentx-primary py-2 px-3 small">Book</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Tab 2: Best for Families (Innova, Fortuner, Mahindra Thar) -->
+    <div class="popular-tab-content d-none" id="popular_families">
+        <div class="row g-4">
+            {% for v in popular_groups.families %}
+            <div class="col-lg-4 col-md-6">
+                <div class="vehicle-card">
+                    <div class="vehicle-img-wrap">
+                        <img src="{{ v.meta.image }}" alt="{{ v.Model }}">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="status-badge-lg {% if v.status == 'Available' %}available{% elif v.status == 'Rented' %}rented{% else %}maintenance{% endif %}">
+                                <span class="pulse-dot"></span> {{ v.status|upper }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-uppercase small fw-bold text-muted">{{ v.meta.category }}</span>
+                            <span class="car-meta-rating"><i class="fa-solid fa-star text-warning"></i> {{ v.meta.rating }}</span>
+                        </div>
+                        <h4 class="fw-bold mb-2">{{ v.Model }}</h4>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-gas-pump text-primary"></i> {{ v.fuel_type }}</span>
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-gear text-primary"></i> {{ v.meta.transmission }}</span>
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-users text-primary"></i> {{ v.meta.seats }} Seats</span>
+                        </div>
+                        <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+                            <div class="car-price-tag">₹{{ v.Rental_rate|floatformat:0 }}<span class="car-price-unit">/day</span></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{% url 'vehicle_detail' v.vehicle_id %}" class="btn-rentx-outline py-2 px-3 small">View</a>
+                                {% if v.status == 'Available' %}
+                                <a href="{% url 'vehicle_detail' v.vehicle_id %}#bookingFormCard" class="btn-rentx-primary py-2 px-3 small">Book</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Tab 3: Budget Friendly (Scooty, Cycle, Yamaha 122) -->
+    <div class="popular-tab-content d-none" id="popular_budget">
+        <div class="row g-4">
+            {% for v in popular_groups.budget %}
+            <div class="col-lg-4 col-md-6">
+                <div class="vehicle-card">
+                    <div class="vehicle-img-wrap">
+                        <img src="{{ v.meta.image }}" alt="{{ v.Model }}">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="status-badge-lg {% if v.status == 'Available' %}available{% elif v.status == 'Rented' %}rented{% else %}maintenance{% endif %}">
+                                <span class="pulse-dot"></span> {{ v.status|upper }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-uppercase small fw-bold text-muted">{{ v.meta.category }}</span>
+                            <span class="car-meta-rating"><i class="fa-solid fa-star text-warning"></i> {{ v.meta.rating }}</span>
+                        </div>
+                        <h4 class="fw-bold mb-2">{{ v.Model }}</h4>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-gas-pump text-primary"></i> {{ v.fuel_type }}</span>
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-gear text-primary"></i> {{ v.meta.transmission }}</span>
+                            <span class="vehicle-spec-pill"><i class="fa-solid fa-users text-primary"></i> {{ v.meta.seats }} Seats</span>
+                        </div>
+                        <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+                            <div class="car-price-tag">₹{{ v.Rental_rate|floatformat:0 }}<span class="car-price-unit">/day</span></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{% url 'vehicle_detail' v.vehicle_id %}" class="btn-rentx-outline py-2 px-3 small">View</a>
+                                {% if v.status == 'Available' %}
+                                <a href="{% url 'vehicle_detail' v.vehicle_id %}#bookingFormCard" class="btn-rentx-primary py-2 px-3 small">Book</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     8. SPECIAL OFFER SECTION
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="special-offer-banner">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-white bg-opacity-20 text-white small fw-bold text-uppercase">
+                    <i class="fa-solid fa-fire text-warning"></i>
+                    <span>Limited Time Promotion</span>
+                </div>
+                <h2 class="fw-bold mb-2" style="font-size: 2.5rem; letter-spacing: -1px;">Weekend Drive Offer</h2>
+                <p class="text-white text-opacity-90 mb-4 fs-5" style="max-width: 600px;">
+                    Get 15% OFF on selected vehicles for weekend bookings.
+                </p>
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <div class="promo-code-pill" id="promoPill">
+                        <span>RENTX15</span>
+                        <button type="button" class="btn btn-sm btn-light py-1 px-2 text-dark fw-bold rounded-2" onclick="copyPromoCode('RENTX15', this)">
+                            <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <a href="#fleet" class="btn btn-light text-primary fw-bold px-4 py-3 rounded-3 shadow">
+                        Book Now
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                <div class="p-4 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-20 text-center">
+                    <div class="text-warning display-5 fw-bold mb-1">15% OFF</div>
+                    <div class="small text-white text-opacity-80">Valid on Friday through Sunday trips</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     9. SAFETY AND TRUST
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="text-center mb-5">
+        <span class="section-headline-tag">Your Protection</span>
+        <h2 class="section-main-heading">Your Safety Comes First</h2>
+        <p class="section-subtext">Every trip is backed by stringent safety standards and round-the-clock vigilance.</p>
+    </div>
+
+    <div class="row g-3">
+        <!-- Regular Vehicle Servicing -->
+        <div class="col-lg-4 col-md-6">
+            <div class="safety-item-box">
+                <div class="fs-4 text-primary">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Regular Vehicle Servicing</h6>
+                    <span class="small text-muted">Periodic mechanical checkups</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verified Vehicles -->
+        <div class="col-lg-4 col-md-6">
+            <div class="safety-item-box">
+                <div class="fs-4 text-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Verified Vehicles</h6>
+                    <span class="small text-muted">100% legal registration & paperwork</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transparent Pricing -->
+        <div class="col-lg-4 col-md-6">
+            <div class="safety-item-box">
+                <div class="fs-4 text-primary">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Transparent Pricing</h6>
+                    <span class="small text-muted">Clear GST invoices & no hidden fees</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secure Payments -->
+        <div class="col-lg-4 col-md-6">
+            <div class="safety-item-box">
+                <div class="fs-4 text-success">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Secure Payments</h6>
+                    <span class="small text-muted">PCI-DSS encrypted transactions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Support -->
+        <div class="col-lg-4 col-md-6">
+            <div class="safety-item-box">
+                <div class="fs-4 text-primary">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Customer Support</h6>
+                    <span class="small text-muted">Friendly assistance for trip queries</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Assistance -->
+        <div class="col-lg-4 col-md-6">
+            <div class="safety-item-box">
+                <div class="fs-4 text-danger">
+                    <i class="fa-solid fa-truck-medical"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Emergency Assistance</h6>
+                    <span class="small text-muted">24/7 on-road recovery network</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     10. CUSTOMER REVIEWS
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="text-center mb-5">
+        <span class="section-headline-tag">Real Experiences</span>
+        <h2 class="section-main-heading">What Our Customers Say</h2>
+        <p class="section-subtext">Read verified feedback from travelers who rented with RENTX across Karnataka.</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Review 1 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="review-card">
+                <div class="review-quote-mark"><i class="fa-solid fa-quote-left"></i></div>
+                <p class="text-secondary flex-grow-1 leading-relaxed">
+                    "Booking was simple and the vehicle was in excellent condition."
+                </p>
+                <div class="d-flex align-items-center gap-3 pt-3 border-top mt-auto">
+                    <div style="width:44px; height:44px; border-radius:50%; background:#2563eb; color:white; font-weight:700; display:flex; align-items:center; justify-content:center;">
+                        RK
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Rahul K.</h6>
+                        <span class="small text-muted">Bengaluru • Verified Trip</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review 2 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="review-card">
+                <div class="review-quote-mark"><i class="fa-solid fa-quote-left"></i></div>
+                <p class="text-secondary flex-grow-1 leading-relaxed">
+                    "Affordable pricing and very good service. Will definitely rent again."
+                </p>
+                <div class="d-flex align-items-center gap-3 pt-3 border-top mt-auto">
+                    <div style="width:44px; height:44px; border-radius:50%; background:#059669; color:white; font-weight:700; display:flex; align-items:center; justify-content:center;">
+                        PS
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Priya S.</h6>
+                        <span class="small text-muted">Chitradurga • Verified Trip</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review 3 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="review-card">
+                <div class="review-quote-mark"><i class="fa-solid fa-quote-left"></i></div>
+                <p class="text-secondary flex-grow-1 leading-relaxed">
+                    "The Honda City was clean and well maintained."
+                </p>
+                <div class="d-flex align-items-center gap-3 pt-3 border-top mt-auto">
+                    <div style="width:44px; height:44px; border-radius:50%; background:#7c3aed; color:white; font-weight:700; display:flex; align-items:center; justify-content:center;">
+                        KM
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Kiran M.</h6>
+                        <span class="small text-muted">Hosadurga • Verified Trip</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     11. RENTX STATISTICS
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="row g-4">
+        <!-- 50+ Vehicles -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-metric-card">
+                <div class="stat-metric-number" data-target="50">50+</div>
+                <h5 class="fw-bold mb-1">Vehicles</h5>
+                <span class="small text-muted">Direct managed fleet</span>
+            </div>
+        </div>
+
+        <!-- 1,000+ Happy Customers -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-metric-card">
+                <div class="stat-metric-number" data-target="1000">1,000+</div>
+                <h5 class="fw-bold mb-1">Happy Customers</h5>
+                <span class="small text-muted">Trips completed successfully</span>
+            </div>
+        </div>
+
+        <!-- 10+ Locations -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-metric-card">
+                <div class="stat-metric-number" data-target="10">10+</div>
+                <h5 class="fw-bold mb-1">Locations</h5>
+                <span class="small text-muted">Pickup & return hubs</span>
+            </div>
+        </div>
+
+        <!-- 4.8/5 Average Rating -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-metric-card">
+                <div class="stat-metric-number text-warning">4.8/5</div>
+                <h5 class="fw-bold mb-1">Average Rating</h5>
+                <span class="small text-muted">From verified travelers</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     12. FAQ SECTION
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="text-center mb-5">
+        <span class="section-headline-tag">Got Questions?</span>
+        <h2 class="section-main-heading">Frequently Asked Questions</h2>
+        <p class="section-subtext">Find clear answers to standard rental, payment, and cancellation policies.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="accordion accordion-rentx" id="rentxFaqAccordion">
+                <!-- Q1 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                            What documents are required to rent a vehicle?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#rentxFaqAccordion">
+                        <div class="accordion-body">
+                            Valid driving licence and government-issued ID are required.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                            Can I cancel my booking?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#rentxFaqAccordion">
+                        <div class="accordion-body">
+                            Cancellation is available according to the rental cancellation policy.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                            Is fuel included?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#rentxFaqAccordion">
+                        <div class="accordion-body">
+                            Fuel charges depend on the selected vehicle and rental plan.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                            Can I extend my rental period?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#rentxFaqAccordion">
+                        <div class="accordion-body">
+                            Yes, subject to vehicle availability.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading5">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                            Is a security deposit required?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#rentxFaqAccordion">
+                        <div class="accordion-body">
+                            A refundable security deposit may be applicable depending on the vehicle.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     13. SERVICE LOCATIONS & READY FOR NEXT JOURNEY CTA
+     ========================================================================== -->
+<section class="container my-5 py-4" id="contact">
+    <div class="text-center mb-5">
+        <span class="section-headline-tag">Wide Operational Network</span>
+        <h2 class="section-main-heading">RENTX Service Locations</h2>
+        <p class="section-subtext">Pick up and return vehicles seamlessly at any of our established Karnataka hubs.</p>
+    </div>
+
+    <!-- Location Hub Pills -->
+    <div class="d-flex justify-content-center flex-wrap gap-3 mb-5">
+        <div class="location-hub-pill">
+            <i class="fa-solid fa-location-dot text-primary"></i>
+            <span>Hosadurga</span>
+        </div>
+        <div class="location-hub-pill">
+            <i class="fa-solid fa-location-dot text-primary"></i>
+            <span>Chitradurga</span>
+        </div>
+        <div class="location-hub-pill">
+            <i class="fa-solid fa-location-dot text-primary"></i>
+            <span>Bengaluru</span>
+        </div>
+        <div class="location-hub-pill">
+            <i class="fa-solid fa-location-dot text-primary"></i>
+            <span>Davanagere</span>
+        </div>
+        <div class="location-hub-pill">
+            <i class="fa-solid fa-location-dot text-primary"></i>
+            <span>Tumakuru</span>
+        </div>
+    </div>
+
+    <!-- Ready for Your Next Journey Callout -->
+    <div class="p-5 rounded-4 text-center bg-light border shadow-sm">
+        <h3 class="fw-bold mb-2" style="font-size: 2.2rem; color: #0f172a; letter-spacing: -0.5px;">Ready for Your Next Journey?</h3>
+        <p class="text-muted fs-5 mb-4 mx-auto" style="max-width: 600px;">
+            RENTX makes vehicle rental simple, affordable, and convenient.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="#fleet" class="btn-rentx-primary px-4 py-3">
+                <i class="fa-solid fa-car-side me-2"></i> Book Your Vehicle Now
+            </a>
+            <a href="tel:89671867956" class="btn btn-outline-dark px-4 py-3 rounded-3 fw-semibold">
+                <i class="fa-solid fa-phone me-2"></i> Call Support
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     14. NEWSLETTER
+     ========================================================================== -->
+<section class="container my-5 py-4">
+    <div class="newsletter-box">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-white bg-opacity-10 text-white small fw-bold">
+            <i class="fa-regular fa-envelope text-primary"></i>
+            <span>Exclusive Membership Perks</span>
+        </div>
+        <h2 class="fw-bold mb-2" style="font-size: 2.4rem; letter-spacing: -1px;">Get the Best Rental Deals</h2>
+        <p class="text-white text-opacity-80 mb-4 mx-auto" style="max-width: 580px; font-size: 1.05rem;">
+            Subscribe to receive exclusive offers, new vehicle arrivals and rental updates.
+        </p>
+        <form id="newsletterForm" onsubmit="handleNewsletterSubmit(event)" class="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2 mx-auto" style="max-width: 560px;">
+            <input type="email" class="newsletter-input" id="newsletterEmail" placeholder="Enter your email address..." required>
+            <button type="submit" class="btn-rentx-primary px-4 py-3 text-nowrap">
+                <span>Subscribe</span>
+                <i class="fa-solid fa-paper-plane ms-1"></i>
+            </button>
+        </form>
+        <div id="newsletterSuccessMsg" class="mt-3 text-success fw-bold d-none">
+            <i class="fa-solid fa-circle-check me-1"></i> Thank you! You're subscribed to RENTX deals.
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ---------------------------------------------------------
+    // Instant Client-Side Fleet Filtering
+    // ---------------------------------------------------------
+    let currentCategoryFilter = 'All';
+    let availableOnlyFilter = false;
+
+    function setFleetCategoryFilter(category, btnElement) {
+        currentCategoryFilter = category;
+        document.querySelectorAll('.fleet-pill-btn').forEach(btn => {
+            btn.classList.remove('btn-primary', 'text-white', 'shadow-sm', 'active');
+            btn.classList.add('btn-light', 'text-dark', 'border');
+        });
+        btnElement.classList.remove('btn-light', 'text-dark', 'border');
+        btnElement.classList.add('btn-primary', 'text-white', 'shadow-sm', 'active');
+
+        // Also sync the hero search select if present
+        const select = document.getElementById('searchCategorySelect');
+        if (select) select.value = category;
+
+        filterFleetLocally();
+    }
+
+    function toggleAvailableOnly(btn) {
+        availableOnlyFilter = !availableOnlyFilter;
+        if (availableOnlyFilter) {
+            btn.classList.remove('btn-outline-success');
+            btn.classList.add('btn-success', 'text-white', 'shadow-sm');
+        } else {
+            btn.classList.remove('btn-success', 'text-white', 'shadow-sm');
+            btn.classList.add('btn-outline-success');
+        }
+        filterFleetLocally();
+    }
+
+    function updatePriceLabel(val) {
+        document.getElementById('priceDisplay').innerText = '₹' + parseInt(val).toLocaleString('en-IN') + '/day';
+        document.getElementById('hiddenMaxPrice').value = val;
+        filterFleetLocally();
+    }
+
+    function resetFleetFilters() {
+        document.getElementById('searchNameInput').value = '';
+        document.getElementById('searchCategorySelect').value = 'All';
+        document.getElementById('searchFuelSelect').value = 'All';
+        document.getElementById('searchTransmissionSelect').value = 'All';
+        document.getElementById('searchSeatsSelect').value = 'All';
+        document.getElementById('searchStatusSelect').value = 'All';
+        document.getElementById('priceRangeSlider').value = 8000;
+        updatePriceLabel(8000);
+
+        currentCategoryFilter = 'All';
+        availableOnlyFilter = false;
+
+        const allPill = document.querySelector('.fleet-pill-btn[data-cat="All"]');
+        if (allPill) {
+            document.querySelectorAll('.fleet-pill-btn').forEach(btn => {
+                btn.classList.remove('btn-primary', 'text-white', 'shadow-sm', 'active');
+                btn.classList.add('btn-light', 'text-dark', 'border');
+            });
+            allPill.classList.remove('btn-light', 'text-dark', 'border');
+            allPill.classList.add('btn-primary', 'text-white', 'shadow-sm', 'active');
+        }
+
+        filterFleetLocally();
+    }
+
+    function filterFleetLocally() {
+        const query = (document.getElementById('searchNameInput')?.value || '').trim().toLowerCase();
+        const categoryVal = document.getElementById('searchCategorySelect')?.value || currentCategoryFilter;
+        const fuelVal = document.getElementById('searchFuelSelect')?.value || 'All';
+        const transVal = document.getElementById('searchTransmissionSelect')?.value || 'All';
+        const seatsVal = document.getElementById('searchSeatsSelect')?.value || 'All';
+        const statusVal = document.getElementById('searchStatusSelect')?.value || 'All';
+        const maxPrice = parseFloat(document.getElementById('priceRangeSlider')?.value || 8000);
+
+        const items = document.querySelectorAll('.fleet-item');
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            const mModel = item.dataset.model || '';
+            const mCat = item.dataset.category || '';
+            const mFuel = item.dataset.fuel || '';
+            const mTrans = item.dataset.transmission || '';
+            const mSeats = item.dataset.seats || '';
+            const mStatus = item.dataset.status || '';
+            const mPrice = parseFloat(item.dataset.price || 0);
+
+            let matches = true;
+
+            // Name Query
+            if (query && !mModel.includes(query) && !mCat.toLowerCase().includes(query)) {
+                matches = false;
+            }
+
+            // Category
+            if (categoryVal !== 'All') {
+                const target = categoryVal.toLowerCase();
+                const cur = mCat.toLowerCase();
+                if (target.includes('suv') && !cur.includes('suv')) matches = false;
+                else if ((target.includes('bike') || target.includes('scooter')) && !cur.includes('bike')) matches = false;
+                else if (target.includes('van') && !cur.includes('van')) matches = false;
+                else if (target.includes('car') && !cur.includes('car')) matches = false;
+                else if (target !== cur) matches = false;
+            }
+
+            // Fuel
+            if (fuelVal !== 'All' && mFuel.toLowerCase() !== fuelVal.toLowerCase()) {
+                matches = false;
+            }
+
+            // Transmission
+            if (transVal !== 'All' && mTrans.toLowerCase() !== transVal.toLowerCase()) {
+                matches = false;
+            }
+
+            // Seats
+            if (seatsVal !== 'All' && mSeats !== seatsVal) {
+                matches = false;
+            }
+
+            // Status
+            if (statusVal !== 'All' && mStatus.toLowerCase() !== statusVal.toLowerCase()) {
+                matches = false;
+            }
+
+            // Available Only quick toggle
+            if (availableOnlyFilter && mStatus.toLowerCase() !== 'available') {
+                matches = false;
+            }
+
+            // Price
+            if (mPrice > maxPrice) {
+                matches = false;
+            }
+
+            if (matches) {
+                item.classList.remove('d-none');
+                visibleCount++;
+            } else {
+                item.classList.add('d-none');
+            }
+        });
+
+        const badge = document.getElementById('fleetCountBadge');
+        if (badge) badge.innerText = `Showing ${visibleCount} Vehicle${visibleCount !== 1 ? 's' : ''}`;
+
+        const emptyMsg = document.getElementById('fleetEmptyState');
+        if (emptyMsg) {
+            if (visibleCount === 0) {
+                emptyMsg.classList.remove('d-none');
+            } else {
+                emptyMsg.classList.add('d-none');
+            }
+        }
+    }
+
+    // ---------------------------------------------------------
+    // Popular Choices Tab Switching
+    // ---------------------------------------------------------
+    function showPopularTab(tabKey, btnElement) {
+        document.querySelectorAll('.popular-tab-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        document.querySelectorAll('.popular-tab-content').forEach(c => c.classList.add('d-none'));
+        const activeTab = document.getElementById('popular_' + tabKey);
+        if (activeTab) activeTab.classList.remove('d-none');
+    }
+
+    // ---------------------------------------------------------
+    // Clipboard Copy Helper
+    // ---------------------------------------------------------
+    function copyPromoCode(code, btn) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(code).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check text-success"></i> Copied!';
+                setTimeout(() => { btn.innerHTML = orig; }, 2500);
+            });
+        }
+    }
+
+    // ---------------------------------------------------------
+    // Newsletter Submit (Frontend Demonstration)
+    // ---------------------------------------------------------
+    function handleNewsletterSubmit(e) {
+        e.preventDefault();
+        const input = document.getElementById('newsletterEmail');
+        const successMsg = document.getElementById('newsletterSuccessMsg');
+        if (input && input.value) {
+            input.value = '';
+            if (successMsg) successMsg.classList.remove('d-none');
+            setTimeout(() => {
+                if (successMsg) successMsg.classList.add('d-none');
+            }, 5000);
+        }
+    }
+</script>
+{% endblock %}

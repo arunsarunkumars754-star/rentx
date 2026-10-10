@@ -1,0 +1,348 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Explore Our Fleet - All Vehicles | RENTX{% endblock %}
+
+{% block extra_css %}
+<style>
+    .catalog-header {
+        background: linear-gradient(135deg, #091222 0%, #111f38 60%, #1e3a6a 100%);
+        border-radius: 24px;
+        padding: 48px 36px;
+        color: #ffffff;
+        margin-bottom: 36px;
+        position: relative;
+        overflow: hidden;
+    }
+    .catalog-header::after {
+        content: '';
+        position: absolute;
+        right: -40px;
+        bottom: -40px;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .filter-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        padding: 24px;
+        margin-bottom: 32px;
+    }
+    .filter-label {
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #64748b;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .filter-label i {
+        color: var(--primary);
+    }
+    .filter-select, .filter-input {
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: #0f172a;
+        padding: 10px 14px;
+        width: 100%;
+        transition: all 0.2s ease;
+    }
+    .filter-select:focus, .filter-input:focus {
+        border-color: var(--primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        outline: none;
+    }
+    .status-badge-lg {
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .status-badge-lg.available {
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+    }
+    .status-badge-lg.rented {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+    .status-badge-lg.maintenance {
+        background: #fffbeb;
+        color: #d97706;
+        border: 1px solid #fde68a;
+    }
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .available .pulse-dot {
+        background: #10b981;
+        box-shadow: 0 0 0 0 rgba(16,185,129,0.7);
+        animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
+        70% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+        100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+    .rented .pulse-dot { background: #ef4444; }
+    .maintenance .pulse-dot { background: #f59e0b; }
+    .vehicle-spec-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #475569;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Header Banner -->
+    <div class="catalog-header">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-20 text-white small fw-semibold">
+                    <i class="fa-solid fa-car-side text-primary"></i>
+                    <span>RENTX Certified Fleet • 100% Sanitized & Insured</span>
+                </div>
+                <h1 class="fw-bold mb-2" style="font-size: 2.6rem; letter-spacing: -1px;">Explore Our Fleet</h1>
+                <p class="text-white text-opacity-75 mb-0" style="font-size: 1.05rem;">
+                    Choose from top-tier sedans, rugged SUVs, cruisers, and spacious passenger vans.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                <span class="badge bg-primary px-4 py-3 fs-6 rounded-pill fw-bold shadow">
+                    <i class="fa-solid fa-list-check me-2"></i> {{ vehicles|length }} Vehicles Found
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multi-Filter Search Console -->
+    <div class="filter-card">
+        <form method="GET" action="{% url 'vehicles_catalog' %}" id="catalogFilterForm">
+            <div class="row g-3">
+                <!-- Search by name -->
+                <div class="col-lg-4 col-md-6">
+                    <label class="filter-label"><i class="fa-solid fa-magnifying-glass"></i> Search Vehicle</label>
+                    <div class="input-group">
+                        <input type="text" name="q" class="filter-input" placeholder="e.g. Fortuner, Duke, Creta..." value="{{ search_query }}">
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="filter-label"><i class="fa-solid fa-shapes"></i> Category</label>
+                    <select name="category" class="filter-select" onchange="this.form.submit()">
+                        <option value="All" {% if current_category == 'All' or not current_category %}selected{% endif %}>All Categories</option>
+                        <option value="Cars" {% if current_category == 'Cars' %}selected{% endif %}>🚗 Cars</option>
+                        <option value="SUVs" {% if current_category == 'SUVs' %}selected{% endif %}>🏔️ SUVs & 4x4</option>
+                        <option value="Bikes" {% if current_category == 'Bikes' %}selected{% endif %}>🏍️ Bikes & Scooters</option>
+                        <option value="Vans" {% if current_category == 'Vans' %}selected{% endif %}>🚐 Vans</option>
+                    </select>
+                </div>
+
+                <!-- Fuel Type -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="filter-label"><i class="fa-solid fa-gas-pump"></i> Fuel Type</label>
+                    <select name="fuel" class="filter-select" onchange="this.form.submit()">
+                        {% for f in fuels %}
+                        <option value="{{ f }}" {% if current_fuel == f %}selected{% endif %}>{{ f }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Transmission -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="filter-label"><i class="fa-solid fa-gear"></i> Transmission</label>
+                    <select name="transmission" class="filter-select" onchange="this.form.submit()">
+                        {% for t in transmissions %}
+                        <option value="{{ t }}" {% if current_transmission == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Seats -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="filter-label"><i class="fa-solid fa-users"></i> Seats</label>
+                    <select name="seats" class="filter-select" onchange="this.form.submit()">
+                        <option value="All" {% if current_seats == 'All' or not current_seats %}selected{% endif %}>All Seats</option>
+                        <option value="1" {% if current_seats == '1' %}selected{% endif %}>1 Seat (Cycle)</option>
+                        <option value="2" {% if current_seats == '2' %}selected{% endif %}>2 Seats (Bikes)</option>
+                        <option value="4" {% if current_seats == '4' %}selected{% endif %}>4 Seats (Thar/M3)</option>
+                        <option value="5" {% if current_seats == '5' %}selected{% endif %}>5 Seats</option>
+                        <option value="7" {% if current_seats == '7' %}selected{% endif %}>7 Seats (Fortuner/Innova)</option>
+                    </select>
+                </div>
+
+                <!-- Max Price Slider / Field -->
+                <div class="col-lg-3 col-md-6">
+                    <label class="filter-label"><i class="fa-solid fa-indian-rupee-sign"></i> Max Price / Day</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="number" name="max_price" class="filter-input" placeholder="Max ₹" min="300" max="10000" step="100" value="{{ current_max_price }}">
+                    </div>
+                </div>
+
+                <!-- Availability -->
+                <div class="col-lg-3 col-md-6">
+                    <label class="filter-label"><i class="fa-solid fa-circle-check"></i> Availability</label>
+                    <select name="status" class="filter-select" onchange="this.form.submit()">
+                        {% for s in statuses %}
+                        <option value="{{ s }}" {% if current_status == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Actions -->
+                <div class="col-lg-6 col-md-12 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn-rentx-primary py-2 px-4 flex-grow-1">
+                        <i class="fa-solid fa-filter me-1"></i> Apply Filters
+                    </button>
+                    <a href="{% url 'vehicles_catalog' %}" class="btn btn-outline-secondary py-2 px-3 fw-semibold rounded-3 text-nowrap">
+                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Quick Category Tabs -->
+        <div class="d-flex gap-2 flex-wrap mt-4 pt-3 border-top">
+            <span class="small fw-bold text-muted d-flex align-items-center me-2">Quick Filter:</span>
+            <a href="{% url 'vehicles_catalog' %}" class="btn btn-sm {% if current_category == 'All' or not current_category %}btn-primary text-white fw-bold shadow-sm{% else %}btn-light text-dark border{% endif %} px-3 py-1 rounded-pill">
+                All
+            </a>
+            <a href="{% url 'vehicles_catalog' %}?category=Cars" class="btn btn-sm {% if current_category == 'Cars' %}btn-primary text-white fw-bold shadow-sm{% else %}btn-light text-dark border{% endif %} px-3 py-1 rounded-pill">
+                🚗 Cars
+            </a>
+            <a href="{% url 'vehicles_catalog' %}?category=SUVs" class="btn btn-sm {% if current_category == 'SUVs' %}btn-primary text-white fw-bold shadow-sm{% else %}btn-light text-dark border{% endif %} px-3 py-1 rounded-pill">
+                🏔️ SUVs & 4x4
+            </a>
+            <a href="{% url 'vehicles_catalog' %}?category=Bikes" class="btn btn-sm {% if current_category == 'Bikes' %}btn-primary text-white fw-bold shadow-sm{% else %}btn-light text-dark border{% endif %} px-3 py-1 rounded-pill">
+                🏍️ Bikes & Scooters
+            </a>
+            <a href="{% url 'vehicles_catalog' %}?category=Vans" class="btn btn-sm {% if current_category == 'Vans' %}btn-primary text-white fw-bold shadow-sm{% else %}btn-light text-dark border{% endif %} px-3 py-1 rounded-pill">
+                🚐 Vans
+            </a>
+            <a href="{% url 'vehicles_catalog' %}?status=Available" class="btn btn-sm {% if current_status == 'Available' %}btn-success text-white fw-bold shadow-sm{% else %}btn-outline-success border{% endif %} px-3 py-1 rounded-pill ms-auto">
+                <i class="fa-solid fa-bolt me-1"></i> Available Only
+            </a>
+        </div>
+    </div>
+
+    <!-- Vehicles Fleet Grid -->
+    <div class="row g-4">
+        {% for v in vehicles %}
+        <div class="col-lg-4 col-md-6">
+            <div class="vehicle-card">
+                <!-- Vehicle Image with Status Badge -->
+                <div class="vehicle-img-wrap">
+                    <img src="{{ v.meta.image }}" alt="{{ v.Model }}" loading="lazy">
+                    <div class="position-absolute top-0 end-0 m-3">
+                        {% if v.status == 'Available' %}
+                        <span class="status-badge-lg available">
+                            <span class="pulse-dot"></span> AVAILABLE
+                        </span>
+                        {% elif v.status == 'Rented' %}
+                        <span class="status-badge-lg rented">
+                            <span class="pulse-dot"></span> RENTED
+                        </span>
+                        {% else %}
+                        <span class="status-badge-lg maintenance">
+                            <span class="pulse-dot"></span> MAINTENANCE
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Vehicle Details Body -->
+                <div class="p-4 d-flex flex-column flex-grow-1">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.5px;">{{ v.meta.category }}</span>
+                        <span class="car-meta-rating">
+                            <i class="fa-solid fa-star text-warning"></i>
+                            <span>{{ v.meta.rating }}</span>
+                        </span>
+                    </div>
+
+                    <h4 class="fw-bold mb-2" style="font-size: 1.28rem; color: #0f172a;">{{ v.Model }}</h4>
+
+                    <!-- Feature Specs Chips -->
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="vehicle-spec-pill">
+                            <i class="fa-solid fa-gas-pump text-primary"></i> {{ v.fuel_type }}
+                        </span>
+                        <span class="vehicle-spec-pill">
+                            <i class="fa-solid fa-gear text-primary"></i> {{ v.meta.transmission }}
+                        </span>
+                        <span class="vehicle-spec-pill">
+                            <i class="fa-solid fa-users text-primary"></i> {{ v.meta.seats }} Seats
+                        </span>
+                    </div>
+
+                    <p class="text-muted small mb-3 text-truncate-2" style="font-size: 0.88rem; line-height: 1.45;">
+                        {{ v.meta.description }}
+                    </p>
+
+                    <!-- Price & Actions Footer -->
+                    <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="car-price-tag">₹{{ v.Rental_rate|floatformat:0 }}<span class="car-price-unit">/day</span></div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{% url 'vehicle_detail' v.vehicle_id %}" class="btn-rentx-outline py-2 px-3 small">
+                                View
+                            </a>
+                            {% if v.status == 'Available' %}
+                            <a href="{% url 'vehicle_detail' v.vehicle_id %}#bookingFormCard" class="btn-rentx-primary py-2 px-3 small">
+                                Book
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 py-5 text-center">
+            <div class="p-5 bg-white rounded-4 border shadow-sm mx-auto" style="max-width: 520px;">
+                <i class="fa-solid fa-car-side text-primary opacity-50 display-3 mb-3"></i>
+                <h4 class="fw-bold">No Vehicles Match Your Filter</h4>
+                <p class="text-muted small mb-4">We could not find any vehicle matching your selected criteria. Try adjusting the category, transmission, or price range.</p>
+                <a href="{% url 'vehicles_catalog' %}" class="btn-rentx-primary px-4 py-2">
+                    <i class="fa-solid fa-rotate-left me-1"></i> Reset All Filters
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

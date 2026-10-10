@@ -1,0 +1,145 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Create Account - RENTX{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 15px;
+    }
+
+    .auth-card-split {
+        background: #ffffff;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+        max-width: 960px;
+        width: 100%;
+        display: flex;
+        border: 1px solid #e2e8f0;
+    }
+
+    .auth-left-banner {
+        flex: 1;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 58, 138, 0.75) 100%), url('/static/images/vehicles/auth_bg.jpg');
+        background-size: cover;
+        background-position: center;
+        padding: 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        color: #ffffff;
+    }
+
+    .auth-right-form {
+        flex: 1.1;
+        padding: 50px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+        .auth-card-split {
+            flex-direction: column;
+        }
+        .auth-left-banner {
+            min-height: 180px;
+            padding: 30px;
+        }
+        .auth-right-form {
+            padding: 30px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card-split">
+        <!-- Left Banner matching mockup -->
+        <div class="auth-left-banner">
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 fs-3 fw-extrabold text-white mb-1">
+                    <i class="fa-solid fa-car-side text-primary"></i>
+                    <span>RENTX</span>
+                </div>
+                <h3 class="fw-bold text-white mb-2">Drive Your Dreams</h3>
+                <p class="text-white-50 small mb-0">Join our community of over 50,000+ drivers across India enjoying flexible, insured rentals.</p>
+            </div>
+        </div>
+
+        <!-- Right Register Form matching mockup -->
+        <div class="auth-right-form">
+            <h2 class="fw-bold mb-1" style="color: #0f172a; font-size: 1.85rem;">Create Account</h2>
+            <p class="text-muted small mb-4">Join RENTX today and start your journey.</p>
+
+            <form action="{% url 'register' %}" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Full Name</label>
+                    <input type="text" name="name" class="form-control form-control-lg fs-6" placeholder="Enter your name" value="Kiran Sharma" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Email</label>
+                    <input type="email" name="email" class="form-control form-control-lg fs-6" placeholder="you@example.com" value="kiran@gmail.com" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Password</label>
+                    <div class="input-group">
+                        <input type="password" name="password" id="regPassword" class="form-control form-control-lg fs-6" placeholder="Create a password" value="Pass@1234" required>
+                        <button class="btn btn-outline-secondary border-start-0" type="button" onclick="togglePassword('regPassword', this)">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted">Confirm Password</label>
+                    <div class="input-group">
+                        <input type="password" name="confirm_password" id="regConfirmPassword" class="form-control form-control-lg fs-6" placeholder="Confirm your password" value="Pass@1234" required>
+                        <button class="btn btn-outline-secondary border-start-0" type="button" onclick="togglePassword('regConfirmPassword', this)">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-rentx-primary w-100 py-3 fs-6">
+                    Register
+                </button>
+            </form>
+
+            <div class="d-flex align-items-center my-4">
+                <hr class="flex-grow-1 text-muted">
+                <span class="px-3 text-muted small fw-bold">OR</span>
+                <hr class="flex-grow-1 text-muted">
+            </div>
+
+            <p class="text-center text-muted small mb-0">
+                Already have an account? <a href="{% url 'login' %}" class="text-primary fw-bold text-decoration-none">Login</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+</script>
+{% endblock %}

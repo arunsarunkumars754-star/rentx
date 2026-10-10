@@ -1,0 +1,88 @@
+{% extends 'rental/base.html' %}
+
+{% block title %}My Bookings - RENTX{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #0f172a; font-size: 2rem;">My Bookings</h2>
+            <p class="text-muted small mb-0">Track your reservations, pickup dates, receipts, and vehicle status</p>
+        </div>
+        <a href="{% url 'vehicles_catalog' %}" class="btn btn-primary px-3 py-2 fw-semibold">
+            <i class="fa-solid fa-plus me-1"></i> Book Another Vehicle
+        </a>
+    </div>
+
+    {% if bookings %}
+    <div class="row g-4">
+        {% for b in bookings %}
+        <div class="col-lg-6">
+            <div class="card border p-4 shadow-sm h-100" style="border-radius: 16px;">
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                    <div>
+                        <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1 mb-2">Booking #{{ b.Booking_id }}</span>
+                        <h4 class="fw-bold mb-1">{{ b.vehicle.Model }}</h4>
+                        <div class="small text-muted">{{ b.vehicle.Plate_no }} • {{ b.vehicle.fuel_type }}</div>
+                    </div>
+                    <div class="text-end">
+                        {% if b.status == 'Confirmed' %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">Confirmed</span>
+                        {% elif b.status == 'Cancelled' %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fs-6">Cancelled</span>
+                        {% else %}
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 fs-6">{{ b.status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="bg-light p-3 rounded-3 mb-3">
+                    <div class="row g-2 small">
+                        <div class="col-6">
+                            <span class="text-muted d-block">Pickup Date</span>
+                            <span class="fw-bold"><i class="fa-regular fa-calendar text-primary me-1"></i> {{ b.start_date|date:"d M Y" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block">Return Date</span>
+                            <span class="fw-bold"><i class="fa-regular fa-calendar-check text-primary me-1"></i> {{ b.end_date|date:"d M Y" }}</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block">Duration</span>
+                            <span class="fw-bold">{{ b.no_of_days }} Days</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block">Total Amount</span>
+                            <span class="fw-bold text-primary fs-6">₹{{ b.total_amount|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
+                    <span class="small text-muted"><i class="fa-solid fa-clock me-1"></i> Booked on {{ b.booking_date|date:"d M Y" }}</span>
+                    <div>
+                        {% if b.status != 'Cancelled' %}
+                        <a href="{% url 'cancel_booking' b.Booking_id %}" onclick="return confirm('Are you sure you want to cancel this booking?')" class="btn btn-outline-danger btn-sm px-3">
+                            Cancel Booking
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'vehicle_detail' b.vehicle.vehicle_id %}" class="btn btn-outline-primary btn-sm px-3 ms-2">
+                            View Vehicle
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card p-5 text-center border-0 bg-white shadow-sm" style="border-radius: 16px;">
+        <i class="fa-solid fa-calendar-xmark text-muted display-4 mb-3"></i>
+        <h4>No Bookings Found</h4>
+        <p class="text-muted">You haven't made any vehicle reservations yet.</p>
+        <div class="mt-2">
+            <a href="{% url 'vehicles_catalog' %}" class="btn btn-primary px-4 py-2 fw-semibold">Browse Available Fleet</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

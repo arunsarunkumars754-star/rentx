@@ -1,0 +1,76 @@
+{% extends 'rental/base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">Vehicle Details</h5>
+                <hr>
+                <p><strong>Model:</strong> {{ vehicle.model }}</p>
+                <p><strong>Rate:</strong> $<span id="dailyRate">{{ vehicle.rental_rate }}</span> / day</p>
+                <p><strong>Fuel:</strong> {{ vehicle.fuel_type }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h3 class="fw-bold mb-4">Book {{ vehicle.model }}</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {% bootstrap_field form.start_date %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {% bootstrap_field form.end_date %}
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <strong>Total Calculated Amount: </strong> $<span id="totalAmount">0.00</span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.getElementById('id_start_date');
+        const endDateInput = document.getElementById('id_end_date');
+        const rateSpan = document.getElementById('dailyRate');
+        const totalSpan = document.getElementById('totalAmount');
+        
+        function calculateTotal() {
+            if (startDateInput.value && endDateInput.value) {
+                const start = new Date(startDateInput.value);
+                const end = new Date(endDateInput.value);
+                const rate = parseFloat(rateSpan.innerText);
+                
+                const timeDiff = end.getTime() - start.getTime();
+                let daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                if (daysDiff < 0) {
+                    totalSpan.innerText = "Invalid Dates";
+                    return;
+                }
+                
+                if (daysDiff === 0) daysDiff = 1; // Minimum 1 day rental
+                
+                const total = daysDiff * rate;
+                totalSpan.innerText = total.toFixed(2);
+            }
+        }
+        
+        startDateInput.addEventListener('change', calculateTotal);
+        endDateInput.addEventListener('change', calculateTotal);
+    });
+</script>
+{% endblock %}

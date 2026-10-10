@@ -1,0 +1,468 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}{{ vehicle.Model }} - Vehicle Details | RENTX{% endblock %}
+
+{% block extra_css %}
+<style>
+    .breadcrumb-rentx {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 20px 0;
+    }
+    .breadcrumb-rentx a {
+        color: #64748b;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-rentx a:hover {
+        color: var(--primary);
+    }
+    .breadcrumb-rentx .active {
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    /* Main Gallery Box */
+    .detail-gallery-box {
+        background: #ffffff;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--card-border);
+        overflow: hidden;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+
+    .main-car-view {
+        height: 380px;
+        background: #f8fafc;
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .main-car-view img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .gallery-thumbnails {
+        display: flex;
+        gap: 12px;
+    }
+
+    .gallery-thumb {
+        width: 80px;
+        height: 60px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: all 0.2s;
+        background: #f1f5f9;
+    }
+
+    .gallery-thumb.active, .gallery-thumb:hover {
+        border-color: var(--primary);
+        opacity: 1;
+    }
+
+    .gallery-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Spec Checklist & Table */
+    .feature-checklist {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 20px 0;
+    }
+
+    .feature-check-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .feature-check-item i {
+        color: #10b981;
+        font-size: 1.1rem;
+    }
+
+    .info-specs-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 15px;
+    }
+
+    .info-specs-table tr td {
+        padding: 10px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.92rem;
+    }
+
+    .info-specs-table tr td:first-child {
+        color: #64748b;
+        font-weight: 500;
+        width: 40%;
+    }
+
+    .info-specs-table tr td:last-child {
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    /* Booking Sticky Card */
+    .booking-card {
+        background: #ffffff;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--card-border);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        padding: 28px;
+        position: sticky;
+        top: 90px;
+    }
+
+    .breakdown-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        color: #475569;
+    }
+
+    .breakdown-row.total-row {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 2px dashed #e2e8f0;
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-rentx">
+        <a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Home</a>
+        <span><i class="fa-solid fa-chevron-right small"></i></span>
+        <a href="{% url 'vehicles_catalog' %}">Vehicles</a>
+        <span><i class="fa-solid fa-chevron-right small"></i></span>
+        <span class="active">{{ vehicle.Model }}</span>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column: Gallery, Specs & Info -->
+        <div class="col-lg-7">
+            <div class="detail-gallery-box mb-4">
+                <div class="main-car-view">
+                    <img id="mainVehicleImage" src="{{ vehicle.meta.image }}" alt="{{ vehicle.Model }}">
+                </div>
+
+                <!-- Thumbnails -->
+                <div class="gallery-thumbnails">
+                    <div class="gallery-thumb active" onclick="changeImage('{{ vehicle.meta.image }}', this)">
+                        <img src="{{ vehicle.meta.image }}" alt="Front">
+                    </div>
+                    <div class="gallery-thumb" onclick="changeImage('/static/images/vehicles/sedan.jpg', this)">
+                        <img src="/static/images/vehicles/sedan.jpg" alt="Angle">
+                    </div>
+                    <div class="gallery-thumb" onclick="changeImage('/static/images/vehicles/luxury.jpg', this)">
+                        <img src="/static/images/vehicles/luxury.jpg" alt="Interior">
+                    </div>
+                    <div class="gallery-thumb" onclick="changeImage('{{ vehicle.meta.image }}', this)">
+                        <img src="{{ vehicle.meta.image }}" alt="Back">
+                    </div>
+                </div>
+
+                <hr class="my-4 text-muted">
+
+                <!-- Header info -->
+                <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+                    <div>
+                        <h2 class="fw-bold mb-1" style="font-size: 2rem;">{{ vehicle.Model }}</h2>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark fw-bold">
+                                <i class="fa-solid fa-star text-dark"></i> {{ vehicle.meta.rating }}
+                            </span>
+                            <span class="text-muted small">({{ vehicle.meta.reviews }} reviews)</span>
+                            <span class="text-muted small">•</span>
+                            <span class="text-muted small">{{ vehicle.meta.category }}</span>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <div class="fs-2 fw-bold text-primary">₹{{ vehicle.Rental_rate|floatformat:0 }} <span class="fs-6 text-muted fw-normal">/ day</span></div>
+                        {% if vehicle.meta.status == 'Available' %}
+                        <span class="status-badge status-available mt-1">
+                            <span class="status-dot"></span> Available
+                        </span>
+                        {% else %}
+                        <span class="status-badge status-rented mt-1">
+                            <span class="status-dot"></span> {{ vehicle.meta.status }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Feature Checkmarks List -->
+                <div class="feature-checklist">
+                    <div class="feature-check-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>{{ vehicle.fuel_type }} Fuel</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>{{ vehicle.meta.transmission }}</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>{{ vehicle.meta.seats }} Comfortable Seats</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Air Conditioning (AC)</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>GPS & Bluetooth Audio</span>
+                    </div>
+                    <div class="feature-check-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>24/7 Roadside Assistance</span>
+                    </div>
+                </div>
+
+                {% if vehicle.status == 'Available' %}
+                <div class="my-4">
+                    <a href="#bookingFormCard" class="btn-rentx-primary w-100 py-3 fs-6">
+                        <i class="fa-solid fa-calendar-check me-2"></i> Book This Vehicle
+                    </a>
+                </div>
+                {% else %}
+                <div class="my-4 p-3 rounded-3 bg-light border border-warning d-flex align-items-center gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-warning fs-3"></i>
+                    <div>
+                        <div class="fw-bold text-dark">Vehicle Unavailable</div>
+                        <div class="small text-muted">This vehicle is currently <strong>{{ vehicle.status }}</strong> and not accepting new bookings.</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Vehicle Information Table -->
+                <h5 class="fw-bold mt-4 mb-3">Vehicle Information</h5>
+                <div class="bg-light p-3 rounded-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <table class="info-specs-table">
+                                <tr>
+                                    <td>Brand</td>
+                                    <td>{{ vehicle.meta.brand }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Model</td>
+                                    <td>{{ vehicle.meta.model_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Year</td>
+                                    <td>{{ vehicle.meta.year }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Fuel Type</td>
+                                    <td>{{ vehicle.fuel_type }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-6">
+                            <table class="info-specs-table">
+                                <tr>
+                                    <td>Transmission</td>
+                                    <td>{{ vehicle.meta.transmission }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Seats</td>
+                                    <td>{{ vehicle.meta.seats }} Person</td>
+                                </tr>
+                                <tr>
+                                    <td>AC</td>
+                                    <td>{{ vehicle.meta.ac }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Color</td>
+                                    <td>{{ vehicle.color }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Description -->
+                <h5 class="fw-bold mt-4 mb-2">Description</h5>
+                <p class="text-secondary leading-relaxed" style="font-size: 0.95rem;">
+                    {{ vehicle.meta.description }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Column: Booking Box -->
+        <div class="col-lg-5">
+            <div class="booking-card" id="bookingFormCard">
+                {% if vehicle.status == 'Available' %}
+                <h4 class="fw-bold mb-4" style="color: #0f172a; letter-spacing: -0.5px;">Book Your Vehicle</h4>
+
+                <form action="{% url 'book_vehicle' vehicle.vehicle_id %}" method="POST" id="bookingForm">
+                    {% csrf_token %}
+
+                    <!-- Pickup Location -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Pickup Location</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-location-dot text-primary"></i></span>
+                            <select name="pickup_location" class="form-select">
+                                {% for loc in locations %}
+                                <option value="{{ loc }}" {% if loc == 'Bengaluru' %}selected{% endif %}>{{ loc }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Pickup Date -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Pickup Date</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-regular fa-calendar text-primary"></i></span>
+                            <input type="date" name="pickup_date" id="pickupDate" class="form-control" value="2026-09-28" onchange="calculateRental()">
+                        </div>
+                    </div>
+
+                    <!-- Return Date -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted">Return Date</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-regular fa-calendar-check text-primary"></i></span>
+                            <input type="date" name="return_date" id="returnDate" class="form-control" value="2026-09-30" onchange="calculateRental()">
+                        </div>
+                    </div>
+
+                    <!-- Customer Contact for Quick Booking -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Customer Name</label>
+                        <input type="text" name="customer_name" class="form-control" placeholder="Enter Your Full Name (e.g. Kiran Kumar, Reddy)" value="{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% elif request.session.customer_name %}{{ request.session.customer_name }}{% endif %}" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted">Customer Email & Phone</label>
+                        <div class="row g-2">
+                            <div class="col-7">
+                                <input type="email" name="customer_email" class="form-control" placeholder="name@example.com" value="{% if user.is_authenticated and user.email %}{{ user.email }}{% elif request.session.customer_email %}{{ request.session.customer_email }}{% endif %}" required>
+                            </div>
+                            <div class="col-5">
+                                <input type="text" name="customer_phone" class="form-control" placeholder="Phone Number" value="{% if request.session.customer_phone %}{{ request.session.customer_phone }}{% endif %}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price Breakdown Box -->
+                    <div class="bg-light p-3 rounded-3 mb-4">
+                        <div class="breakdown-row">
+                            <span id="rentalDaysLabel">Rental (2 days)</span>
+                            <span class="fw-semibold" id="rentalSubtotal">₹{{ rental_total|floatformat:0 }}</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span>GST & Insurance (18%)</span>
+                            <span class="fw-semibold" id="rentalTax">₹{{ tax|floatformat:0 }}</span>
+                        </div>
+                        <div class="breakdown-row total-row">
+                            <span>TOTAL:</span>
+                            <span class="text-primary" id="rentalTotal">₹{{ grand_total|floatformat:0 }}</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-rentx-primary w-100 py-3 fs-6">
+                        <i class="fa-solid fa-lock me-1"></i> CONFIRM BOOKING
+                    </button>
+                    <p class="text-center text-muted small mt-2 mb-0">
+                        <i class="fa-solid fa-shield-halved text-success"></i> Instant confirmation & free cancellation up to 24h before
+                    </p>
+                </form>
+                {% else %}
+                <div class="text-center py-4">
+                    <div class="mb-3">
+                        <span class="badge {% if vehicle.status == 'Rented' %}bg-danger{% else %}bg-warning text-dark{% endif %} px-3 py-2 fs-6 rounded-pill">
+                            <i class="fa-solid fa-ban me-1"></i> CURRENTLY {{ vehicle.status|upper }}
+                        </span>
+                    </div>
+                    <h4 class="fw-bold mb-2">Booking Not Available</h4>
+                    <p class="text-muted small mb-4">
+                        This {{ vehicle.Model }} is currently <strong>{{ vehicle.status }}</strong> and cannot be reserved right now. Please explore our other available vehicles.
+                    </p>
+                    <div class="p-3 bg-light rounded-3 text-start mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-2 small text-muted">
+                            <i class="fa-solid fa-circle-info text-primary"></i>
+                            <span>Status: <strong>{{ vehicle.status }}</strong></span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 small text-muted">
+                            <i class="fa-solid fa-phone text-primary"></i>
+                            <span>Need this specific vehicle? Call support at <strong>+91 89671867956</strong></span>
+                        </div>
+                    </div>
+                    <a href="{% url 'vehicles_catalog' %}?status=Available" class="btn-rentx-primary w-100 py-3">
+                        <i class="fa-solid fa-car me-2"></i> Browse Available Vehicles
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeImage(src, element) {
+        document.getElementById('mainVehicleImage').src = src;
+        document.querySelectorAll('.gallery-thumb').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    const dailyRate = {{ vehicle.Rental_rate }};
+
+    function calculateRental() {
+        const pDateVal = document.getElementById('pickupDate').value;
+        const rDateVal = document.getElementById('returnDate').value;
+
+        if (pDateVal && rDateVal) {
+            const pDate = new Date(pDateVal);
+            const rDate = new Date(rDateVal);
+            const diffTime = rDate - pDate;
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays <= 0) diffDays = 1;
+
+            const subtotal = dailyRate * diffDays;
+            const tax = Math.round(subtotal * 0.18);
+            const total = subtotal + tax;
+
+            document.getElementById('rentalDaysLabel').innerText = `Rental (${diffDays} day${diffDays > 1 ? 's' : ''})`;
+            document.getElementById('rentalSubtotal').innerText = '₹' + subtotal.toLocaleString('en-IN');
+            document.getElementById('rentalTax').innerText = '₹' + tax.toLocaleString('en-IN');
+            document.getElementById('rentalTotal').innerText = '₹' + total.toLocaleString('en-IN');
+        }
+    }
+</script>
+{% endblock %}
